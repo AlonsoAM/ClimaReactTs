@@ -4,7 +4,11 @@ import {type FormEvent, useState} from "react";
 import type {SearchType} from "../../types";
 import Alert from "../alert/Alert.tsx";
 
-const Form = () => {
+type FromProps = {
+  fetchWeather: () => void
+}
+
+const Form = ({fetchWeather}: FromProps) => {
 
   const [search, setSearch] = useState<SearchType>({
     city: '',
@@ -19,13 +23,13 @@ const Form = () => {
       setAlert('Todos los campos son obligatorios')
       return
     }
-    console.log(search)
+    fetchWeather()
   }
 
   return (
     <form className={styles.form}
           onSubmit={handleSubmit}>
-      {alert && <Alert message={alert} />}
+      {alert && <Alert message={alert}/>}
       <div className={styles.field}>
         <label htmlFor="city">Ciudad</label>
         <input type="text"
