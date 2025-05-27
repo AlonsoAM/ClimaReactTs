@@ -1,15 +1,17 @@
 import axios from "axios";
+import { z } from 'zod/v4'
 import type {SearchType, WeatherType} from "../types";
 
-const isWeatherResponse = (dataWeather: unknown): dataWeather is WeatherType => (
-  Boolean(dataWeather) &&
-  typeof dataWeather === 'object' &&
-  typeof (dataWeather as WeatherType).name === 'string' &&
-  typeof (dataWeather as WeatherType).main === 'object' &&
-  typeof (dataWeather as WeatherType).main.temp === 'number' &&
-  typeof (dataWeather as WeatherType).main.temp_max === 'number' &&
-  typeof (dataWeather as WeatherType).main.temp_min === 'number'
-);
+const WeatherSchema = z.object({
+  name: z.string(),
+  main: z.object({
+    temp_max: z.number(),
+    temp_min: z.number(),
+    temp: z.number(),
+  })
+})
+
+type WeatherSchema = z.infer<typeof WeatherSchema>
 
 export const useWeather = () => {
 
@@ -21,15 +23,16 @@ export const useWeather = () => {
       const geoResponse = await axios.get(geoUrl)
       const {lat, lon} = geoResponse.data[0]
       const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appId}`
-      // typeGuards
+      //ZOD
       const weatherResponse = await axios.get(weatherUrl)
-      const result = weatherResponse.data
-      const dataWeather = isWeatherResponse(result)
-      if (dataWeather){
-        console.log(result.name)
+      const dataWeather = weatherResponse.data
+      const result = WeatherSchema.safeParse(dataWeather)
+      if (result.success) {
+        const respuesta = result.data as WeatherType
+        console.log(respuesta)
+      }else{
+        console.warn(result.error)
       }
-
-
     } catch (e) {
       console.error(e)
     }
