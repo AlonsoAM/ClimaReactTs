@@ -5,7 +5,7 @@ import type {SearchType} from "../../types";
 import Alert from "../alert/Alert.tsx";
 
 type FromProps = {
-  fetchWeather: () => void
+  fetchWeather: (search: SearchType) => Promise<void>
 }
 
 const Form = ({fetchWeather}: FromProps) => {
@@ -23,7 +23,7 @@ const Form = ({fetchWeather}: FromProps) => {
       setAlert('Todos los campos son obligatorios')
       return
     }
-    fetchWeather()
+    fetchWeather(search)
   }
 
   return (
