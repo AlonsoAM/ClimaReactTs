@@ -1,20 +1,29 @@
 import axios from "axios";
-import { object, string, number, type InferOutput, parse } from 'valibot'
-import type {SearchType} from "../types";
+import { z } from 'zod/v4'
+import type {SearchType, WeatherType} from "../types";
+import {useState} from "react";
 
-const WeatherSchema = object({
-  name: string(),
-  main: object({
-    temp_max: number(),
-    temp_min: number(),
-    temp: number(),
+const WeatherSchema = z.object({
+  name: z.string(),
+  main: z.object({
+    temp_max: z.number(),
+    temp_min: z.number(),
+    temp: z.number(),
   })
 })
 
-type Weather = InferOutput<typeof WeatherSchema>
+export type WeatherSchema = z.infer<typeof WeatherSchema>
 
 export const useWeather = () => {
 
+  const [weather, setWeather] = useState<WeatherType>({
+    name: '',
+    main: {
+      temp_max: 0,
+      temp_min: 0,
+      temp: 0,
+    }
+  });
 
   const fetchWeather = async (search: SearchType) => {
     const appId = import.meta.env.VITE_API_KEY
@@ -23,12 +32,14 @@ export const useWeather = () => {
       const geoResponse = await axios.get(geoUrl)
       const {lat, lon} = geoResponse.data[0]
       const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appId}`
-      //Valibot
       const weatherResponse = await axios.get(weatherUrl)
       const dataWeather = weatherResponse.data
-      const result: Weather = parse(WeatherSchema, dataWeather)
-      if (result){
-        console.log(result.name)
+      const result = WeatherSchema.safeParse(dataWeather)
+      if (result.success) {
+        const respuesta = result.data as WeatherType
+        setWeather(respuesta)
+      }else{
+        console.warn(result.error)
       }
     } catch (e) {
       console.error(e)
@@ -37,5 +48,6 @@ export const useWeather = () => {
 
   return {
     fetchWeather,
+    weather
   }
 }
