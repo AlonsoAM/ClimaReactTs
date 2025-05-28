@@ -1,0 +1,38 @@
+.form, .field {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form input[type="text"], .form select {
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: transparent;
+  border: .3rem solid var(--white);
+  color: var(--white);
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.field ::placeholder {
+  color: var(--white);
+}
+
+.form select option {
+  background-color: #333; /* Ajusta este color según tu diseño */
+  color: var(--white);
+  font-size: 1.6rem;
+}
+
+.submit {
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: var(--primary);
+  border: none;
+  color: var(--white);
+  font-size: 1.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .3s;
+  text-transform: uppercase;
+}
